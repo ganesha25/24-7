@@ -2,8 +2,8 @@ import mineflayer from 'mineflayer';
 
 function createBot() {
   const bot = mineflayer.createBot({
-    host: 'your-server.aternos.me', // your Aternos server IP (without port)
-    port: 25565, // default port
+    host: 'Bhaikaserver25.aternos.me', // your Aternos server IP (without port)
+    port: 41582, // default port
     username: 'AFK_Bot', // any name
     version: false // auto-detect version
   });
