@@ -11,9 +11,9 @@ app.listen(PORT, () => console.log(`Web server running on port ${PORT}`));
 // 📌 Bot creation function
 function createBot() {
   const bot = mineflayer.createBot({
-    host: 'Bhaikaserver25.aternos.me',  // replace with your Aternos server IP
-    port: 41582,
-    username: 'AFK_Bot',
+    host: 'BindassSMP01.aternos.me',  // replace with your Aternos server IP
+    port: 50832,
+    username: 'Bindass',
     version: false // auto-detect version
   });
 
