@@ -1,56 +1,60 @@
 import mineflayer from 'mineflayer';
 import express from 'express';
 
-// Express setup
+// Web server to keep Render alive
 const app = express();
 const PORT = process.env.PORT || 3000;
 app.get('/', (_, res) => res.send('Garuda AFK Bot is alive!'));
-app.listen(PORT, () => console.log(`Web server running on port ${PORT}`));
+app.listen(PORT, () => console.log(`🌐 Web server running on port ${PORT}`));
 
-// Bot create
+// Start the bot
 function createBot() {
   const bot = mineflayer.createBot({
     host: 'BindassSMP01.aternos.me',
     port: 50832,
     username: 'Bindass',
-    version: false
+    version: false,
   });
 
   const directions = ['forward', 'back', 'left', 'right'];
   let currentDirection = 'forward';
 
-  const startMoving = () => {
-    directions.forEach(dir => bot.setControlState(dir, false));
-    bot.setControlState(currentDirection, true);
-    console.log('➡️ Moving:', currentDirection);
+  // Start moving in current direction
+  const move = () => {
+    directions.forEach(dir => bot.setControlState(dir, false)); // stop all first
+    bot.setControlState(currentDirection, true); // start current
+    console.log(`➡️ Moving ${currentDirection}`);
   };
 
-  const turnRandom = () => {
-    directions.forEach(dir => bot.setControlState(dir, false));
+  // Pick new random direction
+  const switchDirection = () => {
     const others = directions.filter(d => d !== currentDirection);
     currentDirection = others[Math.floor(Math.random() * others.length)];
-    startMoving();
+    move();
   };
 
-  const isBlockInFront = () => {
-    const pos = bot.entity.position.offset(
-      currentDirection === 'forward' ? 0 : currentDirection === 'back' ? 0 : currentDirection === 'left' ? -1 : 1,
-      0,
-      currentDirection === 'forward' ? 1 : currentDirection === 'back' ? -1 : currentDirection === 'left' ? 0 : 0
-    );
-    const block = bot.blockAt(pos);
-    return block && block.boundingBox !== 'empty';
+  // Get block in front of current direction
+  const getFrontBlock = () => {
+    const pos = bot.entity.position.clone();
+
+    if (currentDirection === 'forward') pos.z += 1;
+    if (currentDirection === 'back') pos.z -= 1;
+    if (currentDirection === 'left') pos.x -= 1;
+    if (currentDirection === 'right') pos.x += 1;
+
+    return bot.blockAt(pos);
   };
 
   bot.on('spawn', () => {
-    console.log('✅ Spawned and starting AFK box walk');
+    console.log('✅ Bot Spawned');
 
-    startMoving();
+    move(); // Start movement
 
     setInterval(() => {
-      if (isBlockInFront()) {
-        console.log('🧱 Wall detected, changing direction...');
-        turnRandom();
+      const block = getFrontBlock();
+      if (block && block.boundingBox !== 'empty') {
+        console.log('🧱 Wall ahead! Switching direction...');
+        switchDirection();
       }
     }, 1000);
   });
