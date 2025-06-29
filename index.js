@@ -1,13 +1,13 @@
 import mineflayer from 'mineflayer';
 import express from 'express';
 
-// Express setup to keep Render app alive
+// Express setup
 const app = express();
 const PORT = process.env.PORT || 3000;
 app.get('/', (_, res) => res.send('Garuda AFK Bot is alive!'));
 app.listen(PORT, () => console.log(`Web server running on port ${PORT}`));
 
-// Bot creation function
+// Bot create
 function createBot() {
   const bot = mineflayer.createBot({
     host: 'BindassSMP01.aternos.me',
@@ -16,48 +16,43 @@ function createBot() {
     version: false
   });
 
+  const directions = ['forward', 'back', 'left', 'right'];
+  let currentDirection = 'forward';
+
+  const startMoving = () => {
+    directions.forEach(dir => bot.setControlState(dir, false));
+    bot.setControlState(currentDirection, true);
+    console.log('➡️ Moving:', currentDirection);
+  };
+
+  const turnRandom = () => {
+    directions.forEach(dir => bot.setControlState(dir, false));
+    const others = directions.filter(d => d !== currentDirection);
+    currentDirection = others[Math.floor(Math.random() * others.length)];
+    startMoving();
+  };
+
+  const isBlockInFront = () => {
+    const pos = bot.entity.position.offset(
+      currentDirection === 'forward' ? 0 : currentDirection === 'back' ? 0 : currentDirection === 'left' ? -1 : 1,
+      0,
+      currentDirection === 'forward' ? 1 : currentDirection === 'back' ? -1 : currentDirection === 'left' ? 0 : 0
+    );
+    const block = bot.blockAt(pos);
+    return block && block.boundingBox !== 'empty';
+  };
+
   bot.on('spawn', () => {
-    console.log('✅ Bot spawned and walking inside box.');
+    console.log('✅ Spawned and starting AFK box walk');
 
-    let directions = ['forward', 'back', 'left', 'right'];
-    let currentDirection = 'forward';
-
-    const move = () => {
-      // Stop all movement
-      directions.forEach(dir => bot.setControlState(dir, false));
-      // Start moving in currentDirection
-      bot.setControlState(currentDirection, true);
-    };
-
-    const switchDirection = () => {
-      // Random new direction
-      const otherDirections = directions.filter(d => d !== currentDirection);
-      currentDirection = otherDirections[Math.floor(Math.random() * otherDirections.length)];
-      console.log('🔄 Wall hit! Changing direction to:', currentDirection);
-      move();
-    };
-
-    move(); // Start moving initially
+    startMoving();
 
     setInterval(() => {
-      const blockInFront = bot.blockAt(bot.entity.position.offset(
-        Math.round(bot.entity.yaw / Math.PI * 2) % 4 === 0 ? (currentDirection === 'forward' ? 0 : 0) : 
-        currentDirection === 'forward' ? Math.cos(bot.entity.yaw) : 
-        currentDirection === 'back' ? -Math.cos(bot.entity.yaw) :
-        currentDirection === 'left' ? -Math.sin(bot.entity.yaw) :
-        currentDirection === 'right' ? Math.sin(bot.entity.yaw) : 0,
-        0,
-        Math.round(bot.entity.yaw / Math.PI * 2) % 4 === 0 ? (currentDirection === 'forward' ? 1 : -1) : 
-        currentDirection === 'forward' ? Math.sin(bot.entity.yaw) : 
-        currentDirection === 'back' ? -Math.sin(bot.entity.yaw) :
-        currentDirection === 'left' ? Math.cos(bot.entity.yaw) :
-        currentDirection === 'right' ? -Math.cos(bot.entity.yaw) : 0
-      ));
-
-      if (blockInFront && blockInFront.boundingBox !== 'empty') {
-        switchDirection();
+      if (isBlockInFront()) {
+        console.log('🧱 Wall detected, changing direction...');
+        turnRandom();
       }
-    }, 1000); // Check for wall every second
+    }, 1000);
   });
 
   bot.on('end', () => {
