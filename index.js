@@ -19,29 +19,50 @@ function createBot() {
   bot.on('spawn', () => {
     console.log('✅ Bot Spawned');
 
-    let movingForward = true;
+    let isForwardBackward = true;
+    let directionToggle = true;
 
-    const moveLoop = () => {
-      if (movingForward) {
-        bot.setControlState('back', false);   // stop back
-        bot.setControlState('forward', true); // start forward
-        console.log('➡️ Moving forward');
+    // 🔁 Movement Logic
+    const move = () => {
+      bot.clearControlStates();
+
+      if (isForwardBackward) {
+        if (directionToggle) {
+          bot.setControlState('forward', true);
+          console.log('➡️ Moving forward');
+        } else {
+          bot.setControlState('back', true);
+          console.log('⬅️ Moving back');
+        }
       } else {
-        bot.setControlState('forward', false); // stop forward
-        bot.setControlState('back', true);     // start back
-        console.log('⬅️ Moving back');
+        if (directionToggle) {
+          bot.setControlState('right', true);
+          console.log('➡️ Moving right');
+        } else {
+          bot.setControlState('left', true);
+          console.log('⬅️ Moving left');
+        }
       }
 
-      // Toggle direction after 3 sec
       setTimeout(() => {
-        bot.setControlState('forward', false);
-        bot.setControlState('back', false);
-        movingForward = !movingForward;
+        bot.clearControlStates();
+        directionToggle = !directionToggle;
       }, 3000);
     };
 
-    // Run every 3 seconds
-    setInterval(moveLoop, 3000);
+    setInterval(move, 3000);
+
+    // 🔁 Switch movement mode every 1 minute
+    setInterval(() => {
+      isForwardBackward = !isForwardBackward;
+      console.log(`🔁 Switching to ${isForwardBackward ? 'forward/backward' : 'right/left'} mode`);
+    }, 60000);
+
+    // 🥊 Left click (swing arm) every second
+    setInterval(() => {
+      bot.swingArm(); // left click animation
+      console.log('👊 Left Clicked');
+    }, 1000);
   });
 
   bot.on('end', () => {
