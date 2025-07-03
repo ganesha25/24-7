@@ -12,7 +12,7 @@ function createBot() {
   const bot = mineflayer.createBot({
     host: 'BindassSMP01.aternos.me',
     port: 50832,
-    username: 'Bindass',
+    username: 'Is_Duniya_Ka_PAPA',
     version: false
   });
 
