@@ -19,6 +19,9 @@ function createBot() {
   bot.on('spawn', () => {
     console.log('✅ Bot Spawned');
 
+      // 👇 Login command after spawning
+  bot.chat('/login bindass00');
+
     let isForwardBackward = true;
     let directionToggle = true;
 
