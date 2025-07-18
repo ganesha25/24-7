@@ -1,38 +1,37 @@
-// 📦 Dependencies
 import mineflayer from 'mineflayer';
 import express from 'express';
 
-// 🌐 Keep bot alive on Render.com
 const app = express();
 const PORT = process.env.PORT || 3000;
 app.get('/', (_, res) => res.send('✅ Garuda AFK Bot is alive!'));
 app.listen(PORT, () => console.log(`🌐 Web server running on port ${PORT}`));
 
-// 🔁 Bot Creation Function
 function createBot() {
   const bot = mineflayer.createBot({
-    host: 'astramc.us.to',     // 🔁 Your Bungee server IP
-    port: 11762,               // 🎯 Your Bungee server Port
-    username: 'laluprashadji',       // 🧍 Bot username
-    version: '1.21.1'          // ✅ Minecraft version
+    host: 'astramc.us.to',
+    port: 11762,
+    username: 'Bindass',
+    version: '1.21.1'
   });
 
-  // ✅ On Bot Spawn
   bot.on('spawn', () => {
     console.log('✅ Bot Spawned');
 
-    // 📕 Auto-close GUI windows (like book/menu)
+    // 🧠 Auto Close GUI if any
     bot.on('windowOpen', (window) => {
-      console.log('📕 GUI opened:', window.title);
+      console.log('📕 GUI Opened:', window.title);
       bot.closeWindow();
     });
 
-    // 💬 Server chat message logs
-    bot.on('message', (msg) => {
-      console.log('💬 Server:', msg.toString());
-    });
+    // Extra safety GUI close
+    setTimeout(() => {
+      if (bot.currentWindow) {
+        console.log('📕 Fallback GUI Close');
+        bot.closeWindow();
+      }
+    }, 3000);
 
-    // 📝 Step 1: Register after 5s
+    // 📝 Step 1: Register after 6s
     setTimeout(() => {
       bot.chat('/register bindass00 bindass00');
       console.log('📝 Sent /register');
@@ -42,7 +41,7 @@ function createBot() {
         bot.chat('/login bindass00');
         console.log('🔐 Sent /login');
 
-        // 🎮 Step 3: Switch to duels server after 20s
+        // 🎮 Step 3: Switch server after 20s
         setTimeout(() => {
           bot.chat('/server duels');
           console.log('🎮 Sent /server duels');
@@ -50,9 +49,9 @@ function createBot() {
 
       }, 3000);
 
-    }, 5000);
+    }, 6000);
 
-    // 🕹️ Anti-AFK Movement
+    // Movement Logic
     let isForwardBackward = true;
     let directionToggle = true;
 
@@ -70,35 +69,31 @@ function createBot() {
       }, 3000);
     };
 
-    setInterval(move, 3000); // movement every 3s
+    setInterval(move, 3000);
     setInterval(() => {
       isForwardBackward = !isForwardBackward;
-      console.log(`🔁 Switching direction mode: ${isForwardBackward ? 'forward/backward' : 'left/right'}`);
-    }, 60000); // switch direction every 60s
-
-    // 👊 Left-click every second
+    }, 60000);
     setInterval(() => {
       bot.swingArm();
-      console.log('👊 Left Clicked');
     }, 1000);
   });
 
-  // ❌ On Disconnect
+  bot.on('message', (msg) => {
+    console.log('💬 Server:', msg.toString());
+  });
+
   bot.on('end', (reason) => {
     console.log('⚠️ Bot disconnected. Reason:', reason);
     setTimeout(createBot, 5000);
   });
 
-  // 🚫 On Kick
   bot.on('kicked', (reason) => {
-    console.log('🚫 Bot kicked. Reason:', reason);
+    console.log('🚫 Kicked:', reason);
   });
 
-  // ❗ On Error
   bot.on('error', (err) => {
-    console.log('❗ Bot error:', err);
+    console.log('❗ Error:', err);
   });
 }
 
-// 🚀 Start bot
 createBot();
