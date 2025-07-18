@@ -19,6 +19,13 @@ function createBot() {
   bot.on('spawn', () => {
     console.log('✅ Bot Spawned');
 
+    // 🔒 Try closing any GUI (book/menu) that appears
+    bot.on('windowOpen', (window) => {
+      console.log('📕 GUI Opened:', window.title);
+      bot.closeWindow();
+    });
+
+
     // Step 1: Wait 5s → login
     setTimeout(() => {
       bot.chat('/login bindass00');
