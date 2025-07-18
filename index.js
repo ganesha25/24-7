@@ -19,8 +19,14 @@ function createBot() {
   bot.on('spawn', () => {
     console.log('✅ Bot Spawned');
 
-      // 👇 Login command after spawning
+      // First, login
   bot.chat('/login bindass00');
+
+  // Then, wait a few seconds and send /duels
+  setTimeout(() => {
+    bot.chat('/duels');
+    console.log('🎮 Sent /duels command');
+  }, 3000); // 3 seconds delay
 
     let isForwardBackward = true;
     let directionToggle = true;
