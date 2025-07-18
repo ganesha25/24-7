@@ -24,9 +24,9 @@ function createBot() {
 
   // Then, wait a few seconds and send /duels
   setTimeout(() => {
-    bot.chat('/duels');
-    console.log('🎮 Sent /duels command');
-  }, 3000); // 3 seconds delay
+    bot.chat('/server duels'');
+    console.log('🎮 Sent /server duels');
+  }, 9000); // 3 seconds delay
 
     let isForwardBackward = true;
     let directionToggle = true;
