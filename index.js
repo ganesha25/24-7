@@ -1,58 +1,68 @@
+// 📦 Dependencies
 import mineflayer from 'mineflayer';
 import express from 'express';
 
-// ✅ Web server to keep Render alive
+// 🌐 Keep bot alive on Render.com
 const app = express();
 const PORT = process.env.PORT || 3000;
-app.get('/', (_, res) => res.send('Garuda AFK Bot is alive!'));
+app.get('/', (_, res) => res.send('✅ Garuda AFK Bot is alive!'));
 app.listen(PORT, () => console.log(`🌐 Web server running on port ${PORT}`));
 
-// 🤖 Create and manage bot
+// 🔁 Bot Creation Function
 function createBot() {
   const bot = mineflayer.createBot({
-    host: 'astramc.us.to',
-    port: 11762,
-    username: 'Bindass',
-    version: '1.21.1' // 👈 Important: set correct version here
+    host: 'astramc.us.to',     // 🔁 Your Bungee server IP
+    port: 11762,               // 🎯 Your Bungee server Port
+    username: 'laluprashadji',       // 🧍 Bot username
+    version: '1.21.1'          // ✅ Minecraft version
   });
 
+  // ✅ On Bot Spawn
   bot.on('spawn', () => {
     console.log('✅ Bot Spawned');
 
-    // 🔒 Try closing any GUI (book/menu) that appears
+    // 📕 Auto-close GUI windows (like book/menu)
     bot.on('windowOpen', (window) => {
-      console.log('📕 GUI Opened:', window.title);
+      console.log('📕 GUI opened:', window.title);
       bot.closeWindow();
     });
 
+    // 💬 Server chat message logs
+    bot.on('message', (msg) => {
+      console.log('💬 Server:', msg.toString());
+    });
 
-    // Step 1: Wait 5s → login
+    // 📝 Step 1: Register after 5s
     setTimeout(() => {
-      bot.chat('/login bindass00');
-      console.log('🔐 Sent /login');
+      bot.chat('/register bindass00 bindass00');
+      console.log('📝 Sent /register');
 
-      // Step 2: Wait 20s after login → go to /server duels
+      // 🔐 Step 2: Login after 3s
       setTimeout(() => {
-        bot.chat('/server duels');
-        console.log('🎮 Sent /server duels');
-      }, 20000);
+        bot.chat('/login bindass00');
+        console.log('🔐 Sent /login');
 
-    }, 5000); // delay after spawn
+        // 🎮 Step 3: Switch to duels server after 20s
+        setTimeout(() => {
+          bot.chat('/server duels');
+          console.log('🎮 Sent /server duels');
+        }, 20000);
 
-    // 🔁 Movement Logic
+      }, 3000);
+
+    }, 5000);
+
+    // 🕹️ Anti-AFK Movement
     let isForwardBackward = true;
     let directionToggle = true;
 
     const move = () => {
       bot.clearControlStates();
-
-      if (isForwardBackward) {
-        bot.setControlState(directionToggle ? 'forward' : 'back', true);
-        console.log(directionToggle ? '➡️ Moving forward' : '⬅️ Moving back');
-      } else {
-        bot.setControlState(directionToggle ? 'right' : 'left', true);
-        console.log(directionToggle ? '➡️ Moving right' : '⬅️ Moving left');
-      }
+      const dir = isForwardBackward
+        ? (directionToggle ? 'forward' : 'back')
+        : (directionToggle ? 'right' : 'left');
+      bot.setControlState(dir, true);
+      console.log(`↔️ Moving: ${dir}`);
 
       setTimeout(() => {
         bot.clearControlStates();
@@ -60,27 +70,35 @@ function createBot() {
       }, 3000);
     };
 
-    setInterval(move, 3000);
-
-    // 🔁 Switch movement direction every 60s
+    setInterval(move, 3000); // movement every 3s
     setInterval(() => {
       isForwardBackward = !isForwardBackward;
-      console.log(`🔁 Switching to ${isForwardBackward ? 'forward/backward' : 'right/left'} mode`);
-    }, 60000);
+      console.log(`🔁 Switching direction mode: ${isForwardBackward ? 'forward/backward' : 'left/right'}`);
+    }, 60000); // switch direction every 60s
 
-    // 👊 Left Click every 1s
+    // 👊 Left-click every second
     setInterval(() => {
       bot.swingArm();
       console.log('👊 Left Clicked');
     }, 1000);
   });
 
-  bot.on('end', () => {
-    console.log('⚠️ Bot disconnected. Reconnecting in 5s...');
+  // ❌ On Disconnect
+  bot.on('end', (reason) => {
+    console.log('⚠️ Bot disconnected. Reason:', reason);
     setTimeout(createBot, 5000);
   });
 
-  bot.on('error', err => console.log('❌ Error:', err));
+  // 🚫 On Kick
+  bot.on('kicked', (reason) => {
+    console.log('🚫 Bot kicked. Reason:', reason);
+  });
+
+  // ❗ On Error
+  bot.on('error', (err) => {
+    console.log('❗ Bot error:', err);
+  });
 }
 
+// 🚀 Start bot
 createBot();
